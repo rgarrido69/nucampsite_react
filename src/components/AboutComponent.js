@@ -1,12 +1,15 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { baseUrl } from '../shared/baseUrl';
+import { Loading } from './LoadingComponent';
+import { Fade, Stagger } from 'react-animation-components';
 
 function RenderPartner({ partner }) {
     if (partner) {
         return (
         <React.Fragment>
-            <Media width='150' object src={partner.image} alt={partner.name} />
+            <Media width='150' object src={baseUrl + partner.image} alt={partner.name} />
             <Media body className='ml-5 mb-4'>
                 <Media heading>{partner.name}</Media>
                 {partner.description}
@@ -18,17 +21,35 @@ function RenderPartner({ partner }) {
     return <div /> 
 }
 
-function About(props) {
-
-    const partners = props.partners.map(partner => {
+function PartnerList(props){
+    const partners = props.partners.partners.map((partner) => {
         return (
-            //<h5>{partner.name}</h5>
-            <Media tag='li' key={partner.id}>
+            <Fade>
+                <Media tag='li' key={partner.id}>
                 <RenderPartner partner={partner} />
-            </Media>
+                </Media>
+            </Fade>
         );
     });
+    if (props.partners.isLoading) {
+        return (<Loading />);
+    }
+    if (props.partners.errMess) {
+        return <div className="col"><h4>{props.partners.errMess}</h4></div>;
+    }
+    return(
+        <div className="col mt-4">
+            <Media list>
+                <Stagger in>
+                    {partners}
+                </Stagger>
+            </Media>
+        </div>
+    )
+}
 
+function About(props) {
+ 
     return (
         <div className="container">
             <div className="row">
@@ -83,7 +104,7 @@ function About(props) {
                 </div>
                 <div className="col mt-4">
                     <Media list>
-                        {partners}
+                        <PartnerList partners={props.partners} />
                     </Media>
                 </div>
             </div>
